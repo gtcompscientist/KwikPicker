@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kwik_picker_camera">#000</color>
+    <color name="kwik_picker_gallery">#ccc</color>
+    <color name="kwik_picker_selected">#f0f0f0</color>
+</resources>

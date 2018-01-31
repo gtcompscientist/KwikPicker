@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="kwik_picker_grid_layout_margin">1dp</dimen>
+    <dimen name="kwik_picker_selected_image_height">90dp</dimen>
+</resources>

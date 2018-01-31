@@ -1,0 +1,8 @@
+<resources>
+    <string name="kwik_picker_title">Select Image</string>
+    <string name="no_image">No Image</string>
+    <string name="done">Done</string>
+
+    <string name="select_max_count">Already %1$d images selected</string>
+    <string name="select_min_count">You have to choose %1$d images</string>
+</resources>
