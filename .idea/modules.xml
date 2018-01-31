@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/KwikPicker.iml" filepath="$PROJECT_DIR$/KwikPicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kwikpicker/kwikpicker.iml" filepath="$PROJECT_DIR$/kwikpicker/kwikpicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kwikpicker-sample/kwikpicker-sample.iml" filepath="$PROJECT_DIR$/kwikpicker-sample/kwikpicker-sample.iml" />
+    </modules>
+  </component>
+</project>
