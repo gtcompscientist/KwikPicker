@@ -33,6 +33,10 @@ If you want pick an image from gallery or take a picture, this library can help 
 ### Gradle
 ```javascript
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile 'co.csadev.kwikpicker:1.0.1'
 }
