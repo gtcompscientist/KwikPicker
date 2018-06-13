@@ -5,9 +5,9 @@ import android.database.Cursor
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.annotation.IntDef
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.IntDef
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -19,8 +19,8 @@ import co.csadev.kwikpicker.R
 import co.csadev.kwikpicker.view.KwikSquareFrameLayout
 import co.csadev.kwikpicker.view.KwikSquareImageView
 
-class ImageGalleryAdapter(private var context: Context, private var builder: KwikPicker.Builder) :
-    RecyclerView.Adapter<ImageGalleryAdapter.GalleryViewHolder>() {
+class ImageGalleryAdapter(private var context: Context, private var builder: KwikPicker.Builder?) :
+    androidx.recyclerview.widget.RecyclerView.Adapter<ImageGalleryAdapter.GalleryViewHolder>() {
 
     private var pickerTiles: ArrayList<PickerTile> = ArrayList()
     private var onItemClickListener: OnItemClickListener? = null
@@ -29,11 +29,11 @@ class ImageGalleryAdapter(private var context: Context, private var builder: Kwi
     init {
         selectedUriList = ArrayList()
 
-        if (builder.showCamera) {
+        if (builder?.showCamera == true) {
             pickerTiles.add(PickerTile(tileType = PickerTile.CAMERA))
         }
 
-        if (builder.showGallery) {
+        if (builder?.showGallery == true) {
             pickerTiles.add(PickerTile(tileType = PickerTile.GALLERY))
         }
 
@@ -54,7 +54,7 @@ class ImageGalleryAdapter(private var context: Context, private var builder: Kwi
 
             if (imageCursor != null) {
                 var count = 0
-                while (imageCursor.moveToNext() && count < builder.previewMaxCount) {
+                while (imageCursor.moveToNext() && count < (builder?.previewMaxCount ?: 25)) {
                     val imageLocation =
                         imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA))
                     val imageFile = File(imageLocation)
@@ -98,22 +98,22 @@ class ImageGalleryAdapter(private var context: Context, private var builder: Kwi
         var isSelected = false
         when {
             pickerTile.isCameraTile -> {
-                holder.iv_thumbnail.setBackgroundResource(builder.cameraTileBackgroundResId)
-                holder.iv_thumbnail.setImageDrawable(builder.cameraTileDrawable)
+                holder.iv_thumbnail.setBackgroundResource(builder?.cameraTileBackgroundResId ?: 0)
+                holder.iv_thumbnail.setImageDrawable(builder?.cameraTileDrawable)
             }
             pickerTile.isGalleryTile -> {
-                holder.iv_thumbnail.setBackgroundResource(builder.galleryTileBackgroundResId)
-                holder.iv_thumbnail.setImageDrawable(builder.galleryTileDrawable)
+                holder.iv_thumbnail.setBackgroundResource(builder?.galleryTileBackgroundResId ?: 0)
+                holder.iv_thumbnail.setImageDrawable(builder?.galleryTileDrawable)
             }
             else -> {
                 val uri = pickerTile.imageUri
-                builder.imageProvider.invoke(holder.iv_thumbnail, uri)
+                builder?.imageProvider?.invoke(holder.iv_thumbnail, uri)
                 isSelected = selectedUriList.contains(uri)
             }
         }
 
 
-        val foregroundDrawable: Drawable? = builder.selectedForegroundDrawable ?:
+        val foregroundDrawable: Drawable? = builder?.selectedForegroundDrawable ?:
                 ContextCompat.getDrawable(context, R.drawable.gallery_photo_selected)
 
         (holder.root as FrameLayout).foreground = if (isSelected) foregroundDrawable else null
@@ -141,7 +141,7 @@ class ImageGalleryAdapter(private var context: Context, private var builder: Kwi
 
     class PickerTile internal constructor(
         val imageUri: Uri? = null,
-        val tileType: Long = IMAGE
+        val tileType: Int = IMAGE
     ) {
 
         val isImageTile: Boolean
@@ -167,13 +167,13 @@ class ImageGalleryAdapter(private var context: Context, private var builder: Kwi
         annotation class SpecialTileType
 
         companion object {
-            const val IMAGE = 1L
-            const val CAMERA = 2L
-            const val GALLERY = 3L
+            const val IMAGE = 1
+            const val CAMERA = 2
+            const val GALLERY = 3
         }
     }
 
-    class GalleryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class GalleryViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         var root = view.findViewById(R.id.root) as KwikSquareFrameLayout
         var iv_thumbnail = view.findViewById(R.id.iv_thumbnail) as KwikSquareImageView
     }

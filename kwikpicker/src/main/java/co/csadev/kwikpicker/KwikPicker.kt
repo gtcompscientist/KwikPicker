@@ -11,15 +11,10 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
-import android.support.annotation.ColorRes
-import android.support.design.widget.*
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
-import android.support.v7.app.AppCompatDialog
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.appcompat.app.AppCompatDialog
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
@@ -31,13 +26,13 @@ import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
-class KwikPicker : BottomSheetDialogFragment() {
+class KwikPicker : com.google.android.material.bottomsheet.BottomSheetDialogFragment() {
     private val TAG = "Kwik"
 
     private val REQ_CODE_CAMERA = 1
     private val REQ_CODE_GALLERY = 2
     private val EXTRA_CAMERA_IMAGE_URI = "camera_image_uri"
-    private lateinit var builder: Builder
+    private var builder: Builder? = null
 
     private lateinit var imageGalleryAdapter: ImageGalleryAdapter
     private lateinit var viewTitleContainer: View
@@ -53,11 +48,11 @@ class KwikPicker : BottomSheetDialogFragment() {
     private var selectedUriList: ArrayList<Uri> = ArrayList()
 
     private var cameraImageUri: Uri? = null
-    private var galleryRecycler: RecyclerView? = null
-    private val bottomSheetBehaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+    private var galleryRecycler: androidx.recyclerview.widget.RecyclerView? = null
+    private val bottomSheetBehaviorCallback = object : com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+            if (newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
                 dismissAllowingStateLoss()
             }
         }
@@ -94,7 +89,7 @@ class KwikPicker : BottomSheetDialogFragment() {
         }
 
     private val isMultiSelect: Boolean
-        get() = builder.onMultiImageSelectedListener != null
+        get() = builder?.onMultiImageSelectedListener != null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,7 +101,7 @@ class KwikPicker : BottomSheetDialogFragment() {
         super.onSaveInstanceState(outState)
     }
 
-    fun show(fragmentManager: FragmentManager) {
+    fun show(fragmentManager: androidx.fragment.app.FragmentManager) {
         val ft = fragmentManager.beginTransaction()
         ft.add(this, tag)
         ft.commitAllowingStateLoss()
@@ -115,25 +110,25 @@ class KwikPicker : BottomSheetDialogFragment() {
     override fun setupDialog(dialog: Dialog, style: Int) {
         val acd = dialog as AppCompatDialog
         when(style) {
-            DialogFragment.STYLE_NO_INPUT -> {
+            androidx.fragment.app.DialogFragment.STYLE_NO_INPUT -> {
                 dialog.window?.addFlags(
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                             or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 )
             }
-            DialogFragment.STYLE_NO_FRAME, DialogFragment.STYLE_NO_TITLE -> {
+            androidx.fragment.app.DialogFragment.STYLE_NO_FRAME, androidx.fragment.app.DialogFragment.STYLE_NO_TITLE -> {
                 acd.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
             }
         }
         contentView = View.inflate(context, R.layout.kwik_picker_content_view, null)
         dialog.setContentView(contentView)
         val layoutParams =
-            (contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams
+            (contentView.parent as View).layoutParams as androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
         val behavior = layoutParams.behavior
-        if (behavior != null && behavior is BottomSheetBehavior<*>) {
+        if (behavior != null && behavior is com.google.android.material.bottomsheet.BottomSheetBehavior<*>) {
             behavior.setBottomSheetCallback(bottomSheetBehaviorCallback)
-            if (builder.peekHeight > 0) {
-                behavior.peekHeight = builder.peekHeight
+            if ((builder?.peekHeight ?: 0) > 0) {
+                behavior.peekHeight = builder?.peekHeight ?: 0
             }
         }
 
@@ -148,31 +143,31 @@ class KwikPicker : BottomSheetDialogFragment() {
     }
 
     private fun setSelectionView() {
-        if (builder.emptySelectionText != null) {
-            selectedPhotosEmpty.text = builder.emptySelectionText
+        if (builder?.emptySelectionText != null) {
+            selectedPhotosEmpty.text = builder?.emptySelectionText
         }
     }
 
     private fun setDoneButton() {
-        if (builder.completeButtonText != null) {
-            doneButton.text = builder.completeButtonText
+        if (builder?.completeButtonText != null) {
+            doneButton.text = builder?.completeButtonText
         }
         doneButton.setOnClickListener { onMultiSelectComplete() }
     }
 
     private fun onMultiSelectComplete() {
-        if (selectedUriList.size < builder.selectMinCount) {
-            val message: String? = builder.selectMinCountErrorText
+        if (selectedUriList.size < (builder?.selectMinCount ?: -1)) {
+            val message: String? = builder?.selectMinCountErrorText
                     ?: String.format(
                         resources.getString(R.string.select_min_count),
-                        builder.selectMinCount)
+                        (builder?.selectMinCount ?: -1))
             Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
             return
         }
 
 
         selectedUriList.let {
-            builder.onMultiImageSelectedListener?.invoke(it)
+            builder?.onMultiImageSelectedListener?.invoke(it)
         }
         dismissAllowingStateLoss()
     }
@@ -186,7 +181,7 @@ class KwikPicker : BottomSheetDialogFragment() {
 
     private fun initView(contentView: View) {
         viewTitleContainer = contentView.findViewById(R.id.view_title_container)
-        galleryRecycler = contentView.findViewById(R.id.rc_gallery) as RecyclerView
+        galleryRecycler = contentView.findViewById(R.id.rc_gallery) as androidx.recyclerview.widget.RecyclerView
         titleText = contentView.findViewById(R.id.tv_title) as TextView
         doneButton = contentView.findViewById(R.id.btn_done) as Button
 
@@ -201,12 +196,12 @@ class KwikPicker : BottomSheetDialogFragment() {
 
     private fun setRecyclerView() {
 
-        val gridLayoutManager = GridLayoutManager(activity, 3)
+        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(activity, 3)
         galleryRecycler?.layoutManager = gridLayoutManager
         galleryRecycler?.addItemDecoration(
             GridSpacingItemDecoration(
                 gridLayoutManager.spanCount,
-                builder.spacing,
+                builder?.spacing ?: 1,
                 false
             )
         )
@@ -242,20 +237,19 @@ class KwikPicker : BottomSheetDialogFragment() {
                 addUri(uri)
             }
         } else {
-            builder.onImageSelectedListener?.invoke(uri)
+            builder?.onImageSelectedListener?.invoke(uri)
             dismissAllowingStateLoss()
         }
     }
 
     private fun addUri(uri: Uri): Boolean {
-        if (selectedUriList.size == builder.selectMaxCount) {
-            val message: String?
-            if (builder.selectMaxCountErrorText != null) {
-                message = builder.selectMaxCountErrorText
+        if (selectedUriList.size == (builder?.selectMaxCount ?: -1)) {
+            val message = if (builder?.selectMaxCountErrorText != null) {
+                builder?.selectMaxCountErrorText
             } else {
-                message = String.format(
+                String.format(
                     resources.getString(R.string.select_max_count),
-                    builder.selectMaxCount
+                    (builder?.selectMaxCount ?: -1)
                 )
             }
 
@@ -276,10 +270,10 @@ class KwikPicker : BottomSheetDialogFragment() {
         val px = resources.getDimension(R.dimen.kwik_picker_selected_image_height).toInt()
         thumbnail.layoutParams = FrameLayout.LayoutParams(px, px)
 
-        builder.imageProvider.invoke(thumbnail, uri)
+        builder?.imageProvider?.invoke(thumbnail, uri)
 
 
-        builder.deSelectIconDrawable?.let { closeImage.setImageDrawable(it) }
+        builder?.deSelectIconDrawable?.let { closeImage.setImageDrawable(it) }
 
         closeImage.setOnClickListener { removeImage(uri) }
 
@@ -336,10 +330,10 @@ class KwikPicker : BottomSheetDialogFragment() {
     private fun errorMessage(message: String? = null) {
         val errorMessage = message ?: "Something went wrong."
 
-        if (builder.onErrorListener == null) {
+        if (builder?.onErrorListener == null) {
             Toast.makeText(activity, errorMessage, Toast.LENGTH_SHORT).show()
         } else {
-            builder.onErrorListener?.invoke(errorMessage)
+            builder?.onErrorListener?.invoke(errorMessage)
         }
     }
 
@@ -358,7 +352,7 @@ class KwikPicker : BottomSheetDialogFragment() {
 
     private fun setTitle() {
 
-        if (!builder.showTitle) {
+        if (builder?.showTitle != true) {
             titleText.visibility = View.GONE
 
             if (!isMultiSelect) {
@@ -368,12 +362,12 @@ class KwikPicker : BottomSheetDialogFragment() {
             return
         }
 
-        if (!TextUtils.isEmpty(builder.title)) {
-            titleText.text = builder.title
+        if (!TextUtils.isEmpty(builder?.title)) {
+            titleText.text = builder?.title
         }
 
-        if (builder.titleBackgroundResId > 0) {
-            titleText.setBackgroundResource(builder.titleBackgroundResId)
+        if ((builder?.titleBackgroundResId ?: 0) > 0) {
+            titleText.setBackgroundResource(builder?.titleBackgroundResId ?: 0)
         }
     }
 

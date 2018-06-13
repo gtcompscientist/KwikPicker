@@ -1,6 +1,42 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 3
+        versionName "2.0.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.0.0-alpha3'
+    implementation 'com.google.android.material:material:1.0.0-alpha3'
+    implementation 'androidx.annotation:annotation:1.0.0-alpha3'
+
+    compileOnly 'androidx.legacy:legacy-support-v4:1.0.0-alpha3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+tasks.withType(Javadoc) {
+    // Ignores errors from mavenAndroidJavadocs task
+    // (reference: github.com/novoda/bintray-release/issues/71#issuecomment-164324255)
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
+}
+
 ext {
     bintrayRepo = 'KwikPicker'
     bintrayName = 'KwikPicker'
@@ -14,7 +50,7 @@ ext {
     siteUrl = 'https://github.com/gtcompscientist/KwikPicker'
     gitUrl = 'https://github.com/gtcompscientist/KwikPicker.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = android.defaultConfig.versionName
 
     developerId = 'gtcompscientist'
     developerName = 'Charles Anderson'
@@ -26,42 +62,9 @@ ext {
     allLicenses = ["Apache-2.0"]
 }
 
-android {
-    compileSdkVersion 27
-
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
-    implementation 'com.android.support:support-annotations:27.0.2'
-
-    compileOnly 'com.android.support:support-v4:27.0.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-
-tasks.withType(Javadoc) {
-    // Ignores errors from mavenAndroidJavadocs task
-    // (reference: github.com/novoda/bintray-release/issues/71#issuecomment-164324255)
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addStringOption('encoding', 'UTF-8')
-    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
-}
-
+//To build and deploy:
+// gradlew install
+// gradlew bintrayUpload
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
 repositories {
