@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    compile 'co.csadev.kwikpicker:2.0.0'
+    compile 'co.csadev:kwikpicker:2.0.0'
 }
 
 ```
